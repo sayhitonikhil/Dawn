@@ -1,0 +1,707 @@
+<style>
+  h1{
+    line-height: 1.1;
+  }
+  .about-us-container{
+    width: 1024px;
+    margin: auto;
+    margin-top: 70px;
+  }
+  .banner-section{
+    width: 100%;
+    height: 500px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .background-image{
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .about-us-border-section{
+    padding: 3px;
+    border: 1px dashed white;
+  }
+  .about-us-border-section-black{
+    padding: 3px;
+    border: 1px dashed #cecece;
+    margin-top: 150px;
+    margin-bottom: 150px;
+  }
+  .about-us-heading-section{
+    text-align: center;
+    color: white;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 20px 50px;
+    width: 600px;
+  }
+  .about-us-heading-section h1{
+    font-weight: 400;
+    color: white;
+  }
+  .our-story-section{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .our-story-content-section{
+    padding: 40px;
+    width: 140%;
+  }
+  .our-story-image-section{
+    position: relative;
+    width: 100%;
+    height: 400px;
+  }
+  .our-vision-image-section{
+    position: relative;
+    width: 100%;
+    height: 400px;
+  }
+  .our-story-image-section img{
+    position: absolute;
+    top: -10%;
+    right: -5%;
+    width: 500px;
+    height: 470px;
+    background-size: cover;
+    object-fit: cover;
+  }
+  .our-vision-image-section img{
+    position: absolute;
+    top: -10%;
+    left: -5%;
+    width: 500px;
+    height: 470px;
+    background-size: cover;
+    object-fit: cover;
+  }
+  .director-para{
+    margin: 0;
+    margin-bottom: -23px;
+    font-size: 13px;
+  }
+  .director-name{
+    margin: 0;
+    font-size: 20px;
+  }
+  .our-presence-section{
+    width: 80%;
+    margin: auto;
+    text-align: center;
+    padding: 40px 0px;
+  }
+  .our-presence-section p{
+    margin-top: 20px;
+  }
+  .our-presence-section ul{
+    width: 100px;
+    margin: auto;
+    margin-top: 30px;
+    list-style: none;
+  }
+  .our-presence-section ul li{
+    text-align: left;
+  }
+  .our-presence-section ul li:before {
+    content: "•";
+    color: #F6821F;
+    margin-right: 5px;
+    vertical-align: middle;
+    font-size: 25px;
+  }
+  .our-facts-section{
+    width: 80%;
+    margin: auto;
+    text-align: center;
+    padding: 40px 0px;
+  }
+  .facts-grid-section{
+    width: 100%;
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(3, 33%);
+    align-items: stretch;
+    justify-content: space-between;
+    row-gap: 5px;
+  }
+  .facts-grid-section div{
+    text-align: center;
+    width: 100%;
+    padding: 30px 10px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  }
+  .facts-grid-section div img{
+    width: 50px;
+    margin: auto;
+  }
+  .facts-grid-section div h1{
+    font-size: 35px;
+  }
+  .facts-grid-section div p{
+    margin: 0;
+    margin-top: -20px;
+    font-size: 14px;
+  }
+  .policies-section{
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    border: 1px solid #cecece;
+  }
+  .policies-section div{
+    width: 256px;
+    padding: 30px 10px;
+    border-left: 1px solid #cecece;
+    text-align: center;
+  }
+  .policies-section div img{
+    width: 30px;
+    margin: auto;
+    height: 30px;
+    background-size: cover;
+    object-fit: cover;
+  }
+  .policies-section div h1{
+    font-size: 23px;
+  }
+
+  @media all and (max-width: 1100px){
+    .about-us-container{
+      width: 900px;
+      margin: auto;
+      margin-top: 70px;
+    }
+    .our-story-content-section{
+      padding: 40px;
+      width: 100%;
+    }
+  .our-story-image-section img{
+    position: absolute;
+    top: -9%;
+    right: -5%;
+    width: 500px;
+    height: 470px;
+    background-size: cover;
+    object-fit: cover;
+  }
+      .our-vision-image-section img{
+    position: absolute;
+    top: -12.5%;
+    left: -5%;
+    width: 500px;
+    height: 500px;
+    background-size: cover;
+    object-fit: cover;
+  }
+  }
+
+  @media all and (max-width: 950px){
+    .our-story-content-section{
+      padding: 10px;
+    }
+    .about-us-container{
+      width: 750px;
+      margin: auto;
+      margin-top: 70px;
+    }
+    .policies-section div h1{
+     font-size: 20px;
+    }
+
+    .our-story-image-section img{
+      position: absolute;
+      top: -9%;
+      right: -5%;
+      width: 500px;
+      height: 470px;
+      background-size: cover;
+      object-fit: cover;
+    }
+    .our-vision-image-section img{
+      position: absolute;
+      top: -10%;
+      left: -5%;
+      width: 500px;
+      height: 470px;
+      background-size: cover;
+      object-fit: cover;
+    }
+  }
+
+  @media all and (max-width: 767px){
+      .our-presence-section ul{
+    width: 100px;
+    margin: auto;
+    margin-top: 30px;
+    list-style: none;
+    margin-left: 150px;
+  }
+        .policies-section{
+    width: 550px;
+    margin: auto;
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    row-gap: 20px;
+    border: 1px solid #cecece;
+  }
+      .policies-section div{
+    width: 100%;
+    padding: 30px 10px;
+    border-left: 1px solid #cecece;
+    text-align: center;
+    border-bottom: 1px solid #cecece;
+  }
+      .facts-grid-section{
+    width: 100%;
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(2, 49%);
+    align-items: stretch;
+    justify-content: space-between;
+    row-gap: 5px;
+  }
+      .about-us-border-section-black{
+    padding: 3px;
+    border: 1px dashed #cecece;
+    margin-top: 100px;
+    margin-bottom: 100px;
+  }
+    .about-us-container{
+    width: 550px;
+    margin: auto;
+    margin-top: 70px;
+    }
+    .our-story-section{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    /* row-gap: 20px; */
+    }
+    .our-story-image-section img{
+    position: absolute;
+    top: 0%;
+    right: 0%;
+    width: 550px;
+    height: 600px;
+    background-size: cover;
+    object-fit: cover;
+  }
+  .our-vision-image-section img{
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 550px;
+    height: 600px;
+    background-size: cover;
+    object-fit: cover;
+  }
+      .our-story-image-section{
+    position: relative;
+    width: 100%;
+    height: 600px;
+  }
+  .our-vision-image-section{
+    position: relative;
+    width: 100%;
+    height: 600px;
+  }
+  }
+
+  @media all and (max-width: 650px){
+      .about-us-heading-section{
+    text-align: center;
+    color: white;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 20px 50px;
+    width: 450px;
+  }
+  }
+
+  @media all and (max-width: 570px){
+    .our-presence-section ul{
+    width: 100px;
+    margin: auto;
+    margin-top: 30px;
+    list-style: none;
+    margin-left: 120px;
+  }
+      .policies-section{
+    width: 450px;
+    margin: auto;
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    row-gap: 20px;
+    border: 1px solid #cecece;
+  }
+      .policies-section div{
+    width: 100%;
+    padding: 30px 10px;
+    border-left: 1px solid #cecece;
+    text-align: center;
+    border-bottom: 1px solid #cecece;
+  }
+    .about-us-container{
+    width: 450px;
+    margin: auto;
+    margin-top: 70px;
+    }
+    .our-story-image-section{
+    position: relative;
+    width: 100%;
+    height: 600px;
+  }
+  .our-vision-image-section{
+    position: relative;
+    width: 100%;
+    height: 600px;
+  }
+      .facts-grid-section{
+    width: 100%;
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(2, 49%);
+    align-items: stretch;
+    justify-content: space-between;
+    row-gap: 5px;
+  }
+    .our-story-image-section img{
+    position: absolute;
+    top: 0%;
+    right: 0%;
+    width: 450px;
+    height: 600px;
+    background-size: cover;
+    object-fit: cover;
+  }
+  .our-vision-image-section img{
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 450px;
+    height: 600px;
+    background-size: cover;
+    object-fit: cover;
+  }
+  }
+
+  @media all and (max-width: 470px){
+    .our-presence-section ul{
+    width: 100px;
+    margin: auto;
+    margin-top: 30px;
+    list-style: none;
+    margin-left: 80px;
+  }
+    .facts-grid-section{
+    width: 100%;
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(1, 100%);
+    align-items: stretch;
+    justify-content: space-between;
+    row-gap: 5px;
+  }
+        .about-us-container{
+    width: 350px;
+    margin: auto;
+    margin-top: 70px;
+    }
+    .our-story-image-section{
+    position: relative;
+    width: 100%;
+    height: 500px;
+  }
+  .our-vision-image-section{
+    position: relative;
+    width: 100%;
+    height: 500px;
+  }
+    .our-story-image-section img{
+    position: absolute;
+    top: 0%;
+    right: 0%;
+    width: 350px;
+    height: 500px;
+    background-size: cover;
+    object-fit: cover;
+  }
+  .our-vision-image-section img{
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 350px;
+    height: 500px;
+    background-size: cover;
+    object-fit: cover;
+  }
+    .policies-section{
+    width: 350px;
+    margin: auto;
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    row-gap: 20px;
+    border: 1px solid #cecece;
+  }
+    .about-us-heading-section{
+    text-align: center;
+    color: white;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 20px 50px;
+    width: 350px;
+  }
+  }
+
+    @media all and (max-width: 370px){
+    .our-presence-section ul{
+    width: 100px;
+    margin: auto;
+    margin-top: 30px;
+    list-style: none;
+    margin-left: 80px;
+  }
+    .facts-grid-section{
+    width: 100%;
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(1, 100%);
+    align-items: stretch;
+    justify-content: space-between;
+    row-gap: 5px;
+  }
+        .about-us-container{
+    width: 300px;
+    margin: auto;
+    margin-top: 70px;
+    }
+    .our-story-image-section{
+    position: relative;
+    width: 100%;
+    height: 350px;
+  }
+  .our-vision-image-section{
+    position: relative;
+    width: 100%;
+    height: 350px;
+  }
+    .our-story-image-section img{
+    position: absolute;
+    top: 0%;
+    right: 0%;
+    width: 300px;
+    height: 350px;
+    background-size: cover;
+    object-fit: cover;
+  }
+  .our-vision-image-section img{
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 300px;
+    height: 350px;
+    background-size: cover;
+    object-fit: cover;
+  }
+    .policies-section{
+    width: 300px;
+    margin: auto;
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    row-gap: 20px;
+    border: 1px solid #cecece;
+  }
+    .about-us-heading-section{
+    text-align: center;
+    color: white;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 20px 50px;
+    width: 300px;
+  }
+  }
+</style>
+
+<div class="banner-section" style="background-image: url({{ "AboutUsBanner.jpg" | asset_url}})">
+  <div class="about-us-border-section">
+    <div class="about-us-heading-section">
+      <h1>ABOUT US</h1>
+      <p>
+        Export House is your premier destination for exquisite handloom home decor, offering a curated collection of
+        high-quality products to elevate your living space.
+      </p>
+    </div>
+  </div>
+</div>
+<div class="about-us-container">
+  <div class="about-us-border-section-black">
+    <div class="our-story-section">
+      <div class="our-story-content-section">
+        <h1>Our Story</h1>
+        <p>
+          At Export House, we're driven by a passion for transforming houses into homes. With a commitment to
+          craftsmanship and quality, we curate a diverse range of handpicked home decor items, ensuring that every piece
+          reflects elegance and style.
+        </p>
+        <p>
+          Founded with a vision to bring warmth and personality to every home, Export House has quickly become
+          synonymous with quality and excellence in the world of home decor.
+        </p>
+        <p>
+          Driven by a relentless pursuit of excellence, we continuously strive to expand our product offerings and
+          deliver unparalleled customer satisfaction. With Export House, you can trust that your home decor needs are in
+          good hands.
+        </p>
+      </div>
+      <div class="our-story-image-section">
+        <img src="{{ "our-story.png" | asset_url }}">
+      </div>
+    </div>
+  </div>
+  <div class="about-us-border-section-black">
+    <div class="our-story-section">
+      <div class="our-vision-image-section">
+        <img src="{{ "our-vision.png" | asset_url }}">
+      </div>
+      <div class="our-story-content-section">
+        <h1>Our Vision</h1>
+        <p>
+          Our vision at Export House is to redefine the way people perceive home decor, by offering a curated collection
+          of handpicked products that inspire creativity and elevate everyday living.
+        </p>
+        <p>
+          We envision a world where every home reflects the unique personality and style of its inhabitants, where
+          quality and craftsmanship are paramount, and where beauty and functionality seamlessly coexist.
+        </p>
+        <p>
+          Driven by innovation and a commitment to customer satisfaction, we aim to be the go-to destination for
+          discerning individuals seeking to enhance their living spaces with exquisite handloom home decor.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="about-us-border-section-black">
+    <div class="our-story-section">
+      <div class="our-story-content-section">
+        <p class="director-para">Meet The Director</p>
+        <h1>Difficult Roads lead to Beautiful Destinations</h1>
+        <p>
+          Elevate your living space with Export House's exquisite handloom home decor collection. From luxurious cushion
+          covers to stylish sofa throws and elegant dining table covers, our curated selection promises to add a touch
+          of sophistication and charm to any room.
+        </p>
+        <p>Discover the perfect pieces to transform your house into a home today.</p>
+        <p class="director-name">Mrs. Saloni Jindal</p>
+        <span>Director</span>
+      </div>
+      <div class="our-story-image-section">
+        <img src="{{ "our-vision.png" | asset_url }}">
+      </div>
+    </div>
+  </div>
+  <div class="about-us-border-section-black">
+    <div class="our-presence-section">
+      <h1>Our Presence</h1>
+      <p>
+        Export House stands as a beacon of handcrafted elegance, with a presence in key cities across India, each
+        location carefully selected to cater to diverse tastes and preferences.
+      </p>
+      <p>
+        In the heart of Delhi, our store in Lajpat Nagar II serves as a hub for discerning shoppers, providing access to
+        our exquisite collections of handloom home decor. Meanwhile, in Mohali, Punjab, our store in Sector 82, JLPL,
+        stands as a testament to our commitment to quality and craftsmanship. And nestled amidst the picturesque
+        surroundings of Goa, our store in Fontainhas offers a unique shopping experience, where customers can immerse
+        themselves in the beauty of our curated collections.
+      </p>
+      <p>
+        At Export House, our presence goes beyond just physical locations; it represents our dedication to delivering
+        excellence to every corner of the country.
+      </p>
+      <ul>
+        <li>Delhi</li>
+        <li>Punjab</li>
+        <li>Goa</li>
+      </ul>
+    </div>
+  </div>
+  <div class="about-us-border-section-black">
+    <div class="our-facts-section">
+      <h1>Our Facts</h1>
+      <p>Here's a glimpse into Export House's noteworthy statistics:</p>
+      <div class="facts-grid-section">
+        <div class="firstDiv">
+          <img src="{{ "categories.png" | asset_url }}">
+          <h1>1500+</h1>
+          <p>Products</p>
+        </div>
+        <div class="secondDiv">
+          <img src="{{ "metroCities.png" | asset_url }}">
+          <h1>5+</h1>
+          <p>Metro Cities Covered</p>
+        </div>
+        <div class="thirdDiv">
+          <img src="{{ "collections.png" | asset_url }}">
+          <h1>10+</h1>
+          <p>Exclusive Collections</p>
+        </div>
+        <div class="fourthDiv">
+          <img src="{{ "customers.png" | asset_url }}">
+          <h1>6000+</h1>
+          <p>Satisfied Customers</p>
+        </div>
+        <div class="fifthDiv">
+          <img src="{{ "categories.png" | asset_url }}">
+          <h1>8+</h1>
+          <p>Different Categories</p>
+        </div>
+        <div class="sixthDiv">
+          <img src="{{ "varities.png" | asset_url }}">
+          <h1>15+</h1>
+          <p>Different Varities</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="policies-section">
+    <div>
+      <img src="{{ "Team.png" | asset_url }}">
+      <h1>PROFESSIONAL AND DEDICATED TEAM</h1>
+      <p>Our team is skilled and committed to providing you with top-notch service.</p>
+    </div>
+    <div>
+      <img src="{{ "Designs.png" | asset_url }}">
+      <h1>UNIQUE DESIGNS</h1>
+      <p>Explore our exclusive collection of designs that are one-of-a-kind.</p>
+    </div>
+    <div>
+      <img src="{{ "affordable-products.png" | asset_url }}">
+      <h1>AFFORDABLE PRODUCTS</h1>
+      <p>Discover budget-friendly options without compromising on quality.</p>
+    </div>
+    <div>
+      <img src="{{ "customer-support.png" | asset_url }}">
+      <h1>24/7 SUPPORT</h1>
+      <p>Dedicated team ensures hassle-free assistance for customers.</p>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Section name",
+  "settings": []
+}
+{% endschema %}

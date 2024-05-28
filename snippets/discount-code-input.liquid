@@ -1,0 +1,98 @@
+<style>
+  .discount-code-container{
+    display: none;
+    width: 85%;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  .discount-code-container p{
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .cart-discount{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #E0E0E0;
+    border-radius: 10px;
+    width: 100%;
+    padding: 0px 15px;
+  }
+  .cart-discount input{
+    width: 70%;
+    background-color: white;
+    border: none;
+    padding: 15px 0px;
+    font-size: 14px;
+  }
+  .cart-discount button{
+    border: none;
+    background-color: transparent;
+    width: 30%;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .loading::before {
+    border: 3px solid #acacac;
+    border-top: 2px solid #000;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    animation: spin .5s linear infinite;
+    content: '';
+    position: absolute;
+    right: -37px;
+    top: 0px;
+ }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+
+<div class="discount-code-container">
+  <p>Enter Your Coupon Code below</p>
+  <form>
+  <div class="cart-discount input-wrapper">
+    <input
+      type="text"
+      id="discount_code"
+      name="discount"
+      class="form-control"
+      value=""
+      placeholder="Coupon code"
+      form="cart"
+      required
+    >
+      <button type="submit" class="apply-discount-code">Apply</button>
+  </div>
+  </form>
+</div>
+
+<script>
+  window.shopUrl = '{{ request.origin }}';
+  let discountSubmitBtn = document.querySelector('.apply-discount-code'),
+    discountCodeInput = document.querySelector('[name="discount"]');
+
+  discountSubmitBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    let discountCode = discountCodeInput.value;
+
+    event.target.classList.add('loading');
+
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST', shopUrl + '/cart.js');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        discountSubmitBtn.classList.remove('loading');
+      } 
+    };
+    xhr.send(JSON.stringify({ 'attributes[discount]': discountCode }));
+    xhr.addEventListener('error', function(e) {
+        console.log(`${e.type}}`)
+        discountSubmitBtn.classList.remove('loading');
+    });
+  });
+</script>

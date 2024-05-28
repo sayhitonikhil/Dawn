@@ -1,0 +1,164 @@
+{%- liquid
+   assign container = section.settings.container
+-%}
+
+<style>
+  
+</style>
+
+<div class="{% if container == '1170' %}container-1170{% elsif container == '1770' %}container-1770{% elsif container == 'fullwidth'%}container-full{% else %}container{% endif %}">
+</div>
+
+<script>
+  
+</script>
+
+{% schema %}
+  {
+    "name": "Home Reels Section",
+    "class": "home-reels-section",
+    "settings": [
+      {
+        "type": "header",
+        "content": "t:sections.layout.content"
+      },
+      {
+        "type": "select",
+        "id": "container",
+        "label": "t:sections.layout.container.option",
+        "default": "container",
+        "options": [
+            {
+                "value": "container",
+                "label": "t:sections.layout.container.option1"
+            },
+            {
+                "value": "1170",
+                "label": "t:sections.layout.container.option4"
+            },
+            {
+                "value": "1770",
+                "label": "t:sections.layout.container.option3"
+            },
+            {
+                "value": "fullwidth",
+                "label": "t:sections.layout.container.option2"
+            }
+        ]
+    },
+      {
+        "type": "range",
+        "id": "padding_full_width",
+        "label": "t:sections.layout.container.padding_full_width",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "t:sections.layout.fontsize.fontsize_title.unit",
+        "default": 0,
+        "info": "t:sections.layout.container.info_full_width"
+    },
+    {
+        "type": "checkbox",
+        "id": "disable_padding_content",
+        "label": "t:settings_schema.typography.settings.typography.disable_content_padding",
+        "default": false
+    },
+    {
+        "type": "checkbox",
+        "id": "enable_border_top",
+        "label": "t:sections.layout.container.enable_border_top",
+        "default": false
+    },
+    {
+        "type": "checkbox",
+        "id": "enable_border_bottom",
+        "label": "t:sections.layout.container.enable_border_bottom",
+        "default": false
+    },
+    {
+        "type": "range",
+        "id": "border_height",
+        "label": "t:settings_schema.typography.settings.typography.border_height",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "t:sections.layout.mg_desktop.unit",
+        "default": 1
+    },
+    {
+        "type": "color",
+        "id": "color_border_bottom",
+        "label": "t:settings_schema.colors.settings.colors_name.border_color",
+        "default": "#e8e8e8"
+    },
+    {
+        "type": "header",
+        "content": "t:sections.layout.margin_top"
+    },
+    {
+        "type": "range",
+        "id": "mg_top_desktop",
+        "label": "t:sections.layout.mg_desktop.label",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "t:sections.layout.mg_desktop.unit",
+        "default": 50
+    },
+    {
+        "type": "range",
+        "id": "mg_top_tablet",
+        "label": "t:sections.layout.mg_tablet.label",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "t:sections.layout.mg_desktop.unit",
+        "default": 50
+    },
+    {
+        "type": "range",
+        "id": "mg_top_mobile",
+        "label": "t:sections.layout.mg_mobile.label",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "t:sections.layout.mg_desktop.unit",
+        "default": 50
+    },
+    {
+        "type": "header",
+        "content": "t:sections.layout.margin_bottom"
+    },
+    {
+        "type": "range",
+        "id": "mg_bottom_desktop",
+        "label": "t:sections.layout.mg_desktop.label",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "t:sections.layout.mg_desktop.unit",
+        "default": 50
+    },
+    {
+        "type": "range",
+        "id": "mg_bottom_tablet",
+        "label": "t:sections.layout.mg_tablet.label",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "t:sections.layout.mg_desktop.unit",
+        "default": 50
+    },
+    {
+        "type": "range",
+        "id": "mg_bottom_mobile",
+        "label": "t:sections.layout.mg_mobile.label",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "t:sections.layout.mg_desktop.unit",
+        "default": 50
+    }
+    ]
+  }
+{% endschema %}

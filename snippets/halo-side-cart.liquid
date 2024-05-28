@@ -1,0 +1,899 @@
+<style>
+  .discount-input-button-section{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #c7c7c7;
+    border-radius: 15px;
+    display: none;
+  }
+  .discount-input-button-section input{
+    width: 80%;
+    border-radius: 15px;
+    border: none;
+  }
+  .discount-input-button-section .button.button-1{
+    width: 20%;
+    margin: 0;
+    border: none;
+    background-color: transparent;
+    color: black;
+  }
+  .discount-loading-section{
+    background-color: rgba(0, 0, 0, 0.7);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 101;
+    transition: 0.5s opacity ease, 0.5s visibility ease;
+  }
+  .show-loading{
+    opacity: 1;
+    visibility: visible;
+  }
+  .loading-spinner {
+    border: 4px solid white;
+    border-top: 4px solid transparent;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-top: -30px;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+
+{%- liquid
+  assign product = all_products[settings.cart_product_gift]
+  assign product_downcase = product | downcase
+  assign id = product.selected_or_first_available_variant.id | minus: 0
+
+  assign check = false
+  for item in cart.items
+    if item.id == id
+      assign check = true
+    endif
+  endfor
+-%}
+{% unless cart == empty %}
+  <div class="previewCart">
+    <ul class="previewCartList list-unstyled" style="overflow-y: scroll; height: 100%;">
+      {%- for item in cart.items -%}
+        <li class="previewCartItem clearfix" data-item-row>
+          <a href="{{ item.url }}" class="previewCartItem-image" style="width: 80px; height: 80px;">
+            <img
+              srcset="{{ item.image | img_url: '110x' }}"
+              src="{{ item.image | img_url: '110x' }}"
+              width="110"
+              height="{{ 110 | divided_by: item.image.aspect_ratio | round }}"
+              alt="{{ item.title | escape }}"
+              sizes="auto"
+              loading="lazy"
+              style="border: none;"
+            >
+          </a>
+          <div class="previewCartItem-content cart-item-block-right">
+            {%- liquid
+              assign thisHandle = item.product.handle
+              assign thisProduct = all_products[thisHandle]
+            -%}
+            <script type="text/javascript">
+              window.cart_selling_array_{{ thisProduct.id }} = {
+                  {% for variantProduct in thisProduct.variants %}
+                      '{{ variantProduct.id }}': '{{ variantProduct.inventory_policy }}',
+                  {%endfor%}
+              };
+            </script>
+            <a style="text-align:right;" class="previewCartItem-name link-underline" href="{{ item.url }}">
+              <span class="text" style="font-size: 12px;">{{ item.product.title }}</span>
+            </a>
+            {%- if item.product.variants.size != 0 -%}
+              {%- unless item.variant.title contains 'Default' -%}
+                <div class="">
+                  {% comment %}
+                    {%- if settings.show_quick_edit_cart -%}
+                         <button type="button" class="previewCartItem-edit" data-open-edit-cart data-edit-cart-url="{{ item.url }}&view=ajax_edit_cart" data-edit-cart-id="{{ item.id }}" data-edit-cart-quantity="{{ item.quantity }}" data-line="{{ item.key }}" title="{{ 'sections.cart.edit_title' | t: title: item.variant.title }}">
+                             {% render 'icon-edit' %}
+                         </button>
+                     {%- endif -%}
+                  {% endcomment %}
+                  <a style="text-align:right;" class="previewCartItem-name link-underline" href="{{ item.url }}">
+                    <span class="previewCartItem-variant text" style="font-size: 10px;">
+                      {{ item.variant.title }}
+                    </span>
+                  </a>
+                </div>
+              {%- endunless -%}
+            {%- endif -%}
+            <dl class="card-properties definitionList cart-item-properties">
+              {%- if item.properties.size != 0 -%}
+                {%- for property in item.properties -%}
+                  {%- assign property_first_char = property.first | slice: 0 -%}
+                  {%- if property.last != blank and property_first_char != '_' -%}
+                    <div class="product-option">
+                      <dt class="definitionList-key">{{ property.first }}:</dt>
+                      <dd class="definitionList-value">
+                        {%- if property.last contains '/uploads/' -%}
+                          <a href="{{ property.last }}" target="_blank">
+                            {{ property.last | split: '/' | last }}
+                          </a>
+                        {%- else -%}
+                          {{ property.last }}
+                        {%- endif -%}
+                      </dd>
+                    </div>
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- endif -%}
+            </dl>
+            {%- if item.discounts.size > 0 -%}
+              <ul class="cart-discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+                {%- for discount in item.discounts -%}
+                  <li class="discounts__discount" data-auto-discount="{{ discount.total_savings }}">
+                    {%- render 'icon-discount' -%}
+                    {{ discount.title }}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+            <div class="previewCartItem-change">
+              {%- liquid
+                if item.original_price != item.final_price
+                  assign price_to_display = item.final_price
+                else
+                  assign price_to_display = item.original_price
+                endif
+              -%}
+              <div
+                style="display:flex; justify-content: right; grid-gap:15px;"
+                class="previewCartItem-price"
+                data-price="{{ price_to_display }}"
+                data-original-price="{{ item.original_price }}"
+              >
+                <span style="margin-top:10px;" class="price">
+                  {%- assign current_variant = item.variant -%}
+                  {% if item.original_price != item.final_price %}
+                    <span class="previewCartItem-saving-price">
+                      <s class="before-discount-price" data-item-original-price-display>
+                        {{ item.original_price | money }}
+                      </s>
+                      <span class="discounted-price" data-item-final-price-display style="font-size: 13px;">
+                        {{ item.final_price | money }}
+                      </span>
+                    </span>
+                  {% elsif current_variant.compare_at_price > current_variant.price %}
+                    <span class="discounted-price">
+                      {{ current_variant.price | money }}
+                    </span>
+
+                    <span class="previewCartItem-saving-price saved_compare_price" data-price-from-compare>
+                      <s class="before-discount-price" style="font-size: 13px;">
+                        {{ current_variant.compare_at_price | money }}
+                      </s>
+                      {% comment %}
+                        <span class="discounted-price">
+                            {{ current_variant.price | money }}
+                        </span>
+                      {% endcomment %}
+                    </span>
+
+                  {% else %}
+                    <span data-item-final-price-display style="font-size: 14px;">
+                      {{ item.price | money }}
+                    </span>
+                  {% endif %}
+                </span>
+                <cart-update-quantity
+                  class="previewCartItem-qty"
+                  data-product="{{ item.product_id }}"
+                  data-variant="{{ item.variant.id }}"
+                >
+                  <label class="form-label hiddenLabels" for="upsell-update-{{ item.id }}">
+                    {{ 'sections.cart.heading.quantity' | t }}
+                  </label>
+                  <a href="#" data-minus-quantity-cart="" class="minus btn-quantity"></a>
+                  <input
+                    class="form-input quantity"
+                    name="quantity"
+                    id="upsell-update-{{ item.id }}"
+                    data-qtt-id1="quantity{{ item.id }}"
+                    value="{{ item.quantity }}"
+                    type="number"
+                    {% if item.variant.inventory_management != null and item.variant.inventory_quantity > 0 %}
+                      data-inventory-quantity="{{ item.variant.inventory_quantity }}"
+                    {% endif %}
+                    data-cart-quantity
+                    data-cart-quantity-id="{{ item.id }}"
+                    data-line="{{ item.key }}"
+                  >
+                  <a href="#" data-plus-quantity-cart="" class="plus btn-quantity"></a>
+                </cart-update-quantity>
+              </div>
+            </div>
+          </div>
+            <button type="button" class="previewCartItem-remove" data-cart-remove data-cart-remove-id="{{ item.id }}" data-line="{{ item.key }}" title="{{ 'sections.cart.remove_title' | t: title: item.title }}">
+                {% render 'icon-trash-bin' %}
+            </button>
+        </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- if settings.show_quick_cart_popular_product -%}
+      {%- liquid
+        assign collection = collections[settings.quick_cart_popular_product_collection]
+        assign limit = settings.quick_cart_popular_product_show
+        assign show_dots = settings.quick_cart_popular_product_dots
+        assign show_arrows = settings.quick_cart_popular_product_arrows
+      -%}
+      <div class="previewCartCollection">
+        {% if settings.quick_cart_popular_product_title != blank %}
+          <div class="previewCartTitle text-left">
+            {{ settings.quick_cart_popular_product_title | escape }}
+          </div>
+        {% endif %}
+        <div class="previewCartProduct" data-product-collection-cart>
+          <div
+            class="previewCartCarousel products-carousel"
+            data-item-dots="{{ show_dots }}"
+            data-item-arrows="{{ show_arrows }}"
+          >
+            {%- for product in collection.products limit: limit -%}
+              <div class="product">
+                {% render 'product-card-sidebar', product_card_product: product %}
+              </div>
+            {%- else -%}
+              {%- for product in (1..limit) -%}
+                <div class="product">
+                  {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+                  {% render 'product-card-custom-placeholder', index: current %}
+                </div>
+              {%- endfor -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if settings.show_cart_note
+    or settings.show_cart_gift
+    or settings.show_cart_shipping
+    or settings.show_cart_discount
+  -%}
+    <cart-item-tool class="previewCartTool">
+      {%- if settings.show_cart_note -%}
+        <div class="cartTool-item cart-tool-note" data-popup="popup-tool-note">
+          <span>
+            {% render 'icon-cart-note' %}
+          </span>
+        </div>
+      {%- endif -%}
+      {%- if settings.show_cart_gift and product_downcase != 'emptydrop' and check == false -%}
+        <div class="cartTool-item cart-tool-gift" data-popup="popup-tool-gift">
+          <span>
+            {% render 'icon-cart-gift' %}
+          </span>
+        </div>
+      {%- endif -%}
+      {%- if settings.show_cart_shipping -%}
+        <div class="cartTool-item cart-tool-shipping" data-popup="popup-tool-shipping">
+          <span>
+            {% render 'icon-cart-shipping' %}
+          </span>
+        </div>
+      {%- endif -%}
+      {%- if settings.show_cart_discount -%}
+        <div
+          class="cartTool-item cart-tool-discount"
+          data-popup="popup-tool-discount"
+          style="padding: 10px; border-radius: 10px;"
+          id="cart-tool-discount"
+        >
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <span>
+              {% render 'discount-percentage' %}
+            </span>
+            <span style="text-align: left; margin-top: 1px; font-size: 14px;">View All Discounts</span>
+            <!-- <p style="font-size: 10px; margin: 0; margin-top: -7px;">Get Exclusive Discounts</p> -->
+          </div>
+          <div style="margin-top: 3px;">
+            <span style="font-size: 20px;">></span>
+          </div>
+        </div>
+      {%- endif -%}
+    </cart-item-tool>
+    <div class="popup-toolDowns">
+      {% if settings.show_cart_note %}
+        <div class="popup-toolDown" id="popup-tool-note">
+          <cart-note class="cart__note">
+            <label for="Cart-note">
+              {%- render 'icon-cart-note' -%}
+              {{- 'sections.cart.note' | t -}}
+            </label>
+            <textarea
+              class="text-area text-area--resize-vertical field__input"
+              name="note"
+              id="Cart-note"
+              placeholder="{{ 'sections.cart.note' | t }}"
+            >{{ cart.note }}</textarea>
+            <button type="button" title="{{ 'general.cart.save' | t }}" class="button button-1" data-update-note>
+              {{ 'general.cart.save' | t }}
+            </button>
+          </cart-note>
+          <cart-cancel-popup>
+            <div class="cart-cancel-popup">
+              <button type="button" title="{{ 'general.cart.cancel' | t }}" class="button button-2">
+                {{ 'general.cart.cancel' | t }}
+              </button>
+            </div>
+          </cart-cancel-popup>
+        </div>
+      {% endif %}
+
+      {% if settings.show_cart_gift and product_downcase != 'emptydrop' and check == false %}
+        <div class="popup-toolDown" id="popup-tool-gift">
+          <gift-card-cart id="is-a-gift" data-id="{{ id }}">
+            {% render 'icon-cart-gift' %}
+            <div class="content-gift text-center">
+              {{ settings.gift_content }}
+            </div>
+            <button
+              type="button"
+              title="{{ 'general.cart.add_a_gift_wrap' | t }}"
+              class="button button-1"
+              id="gift-wrapping"
+              data-gift-id="{{ product.selected_or_first_available_variant.id }}"
+              data-gift-price="{{ product.selected_or_first_available_variant.price }}"
+            >
+              {{ 'general.cart.add_a_gift_wrap' | t }}
+            </button>
+            <input type="hidden" value="yes">
+          </gift-card-cart>
+          <cart-cancel-popup>
+            <div class="cart-cancel-popup">
+              <button type="button" title="{{ 'general.cart.cancel' | t }}" class="button button-2">
+                {{ 'general.cart.cancel' | t }}
+              </button>
+            </div>
+          </cart-cancel-popup>
+        </div>
+      {%- endif -%}
+
+      {% if settings.show_cart_shipping %}
+        <div class="popup-toolDown" id="popup-tool-shipping">
+          {% render 'shipping-rates-calculator' %}
+          <cart-cancel-popup>
+            <div class="cart-cancel-popup">
+              <button type="button" title="{{ 'general.cart.cancel' | t }}" class="button button-2">
+                {{ 'general.cart.cancel' | t }}
+              </button>
+            </div>
+          </cart-cancel-popup>
+        </div>
+      {% endif %}
+
+      {% if settings.show_cart_discount %}
+        <div class="popup-toolDown" id="popup-tool-discount">
+          <coupon-code class="discount-code-field">
+            <label for="coupon-code">
+              {%- render 'icon-cart-discount' -%}
+              {{- settings.coupon_title -}}
+            </label>
+            <p>{{ settings.coupon_content }}</p>
+            <!-- <h1>Display here</h1> -->
+            <div class="available-discounts-overflow-section"></div>
+            <div class="discount-input-button-section">
+              <input autocomplete="off" type="text" name="discount" id="coupon-code" class="field__input">
+              <button
+                type="button"
+                title="{{ 'general.cart.apply_coupon_text' | t }}"
+                class="button button-1 apply-discount-code"
+                data-update-coupon
+              >
+                {{ 'general.cart.apply_coupon_text' | t }}
+              </button>
+            </div>
+          </coupon-code>
+          <cart-cancel-popup>
+            <div class="cart-cancel-popup">
+              <button type="button" title="{{ 'general.cart.cancel' | t }}" class="button button-2">
+                {{ 'general.cart.cancel' | t }}
+              </button>
+            </div>
+          </cart-cancel-popup>
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="previewCartInfo">
+    <ul class="previewCartTotalsPrice list-unstyled">
+      {% comment %}
+         <li class="cart-discount cart-total-savings" {% if cart.total_discount == 0 %} style="display: none;"{% endif %} data-saved-discount-display>
+        	<div class="previewCartTotals-label">
+                   <span class="text">{{ 'general.cart.subtotal' | t }}</span>
+               </div>
+               <div class="previewCartTotals-value" data-cart-subtotal>
+               	<span class="text" data-saved-discount-value>{{ cart.original_total_price | money }}</span>
+               </div>
+        </li>
+
+           <li class="previewCartTotals subTotal clearfix">
+        	<div class="cart-message">
+                 {% render 'free-shipping-component' %}
+               </div>
+        </li>
+
+           <li class="previewCartTotals cart-total-savings" {% if item.original_price == item.price %}style="display: none;"{% endif %} data-saved-discount-display>
+               <div class="previewCartTotals-label">
+                   <span class="text">{{ 'general.cart.are_saving' | t }}</span>
+               </div>
+               <div class="previewCartTotals-value">
+                   <span class="text" data-saved-discount-value>{{ cart.total_discount | money }}</span>
+               </div>
+           </li>
+           <li class="previewCartTotals cart-total-savings" {% if item.original_price == item.price %}style="display: none;"{% endif %} data-saved-discount-display>
+               <div class="previewCartTotals-label">
+                   <span class="text">{{ 'general.cart.are_saving' | t }}</span>
+               </div>
+               <div class="previewCartTotals-value">
+                   <span class="text" data-saved-discount-value>{{ cart.total_discount | money }}</span>
+               </div>
+           </li>
+      {% endcomment %}
+      {% comment %} Total Bill Breakdown {% endcomment %}
+      <!--
+        <li class="previewCartTotals total clearfix" {% if cart.total_discount == 0 %} style="display: none;"{% endif %} data-saved-discount-display id="total-bill-breakdown">
+        	<div class="previewCartTotals-label" style="width: 170px;"></div>
+        </li>
+      -->
+      <!--
+        <li class="previewCartTotals total clearfix" data-saved-discount-display id="total-bill-breakdown">
+          <div class="previewCartTotals-label" style="width: 170px;">
+            {{ 'general.cart.bill_breakdown' | t }}
+          </div>
+        </li>
+      -->
+      {% comment %} Before Discount {% endcomment %}
+      <!--
+        <li class="previewCartTotals total clearfix" {% if cart.total_discount == 0 %} style="display: none;"{% endif %} data-saved-discount-display>
+        	<div class="previewCartTotals-label"></div>
+               <div class="previewCartTotals-value" data-cart-total-value="{{ cart.total_price }}">
+               	{{ cart.original_total_price | money }}
+               </div>
+        </li>
+      -->
+      <!--
+        <li class="previewCartTotals total clearfix" data-saved-discount-display id="item-total">
+          <div class="previewCartTotals-label">
+            {{ 'general.cart.item_total' | t }}
+            <span class="fade-text">(MRP)</span>
+          </div>
+          <div class="previewCartTotals-value" data-cart-total-value="{{ cart.total_price }}">
+            {{ cart.original_total_price | money }}
+          </div>
+        </li>
+      -->
+      {% comment %} Total Discount {% endcomment %}
+      <!--
+        <li class="previewCartTotals total clearfix" {% if cart.total_discount == 0 %} style="display: none;"{% endif %} data-saved-discount-display id="totalDiscount">
+        	<div class="previewCartTotals-label" style="color: #008631">
+                   {{ 'general.cart.are_saving' | t }}
+               </div>
+               <div class="previewCartTotals-value" data-cart-total-value="{{ cart.total_price }}" style="color: #008631">
+               	-{{ cart.total_discount | money }}
+               </div>
+        </li>
+      -->
+      <!--
+        <li
+          class="previewCartTotals total clearfix"
+          data-saved-discount-display
+          id="total-discount"
+          {% if cart.total_discount == 0 %}
+            style="display: none;"
+          {% endif %}
+        >
+          <div class="previewCartTotals-label" style="color: #008631">
+            {{ 'general.cart.are_saving' | t }}
+          </div>
+          <div
+            class="previewCartTotals-value"
+            data-cart-total-value="{{ cart.total_price }}"
+            style="color: #008631"
+            id="total-discount-value-section"
+          >
+            -{{ cart.total_discount | money }}
+          </div>
+        </li>
+      -->
+      {% comment %} After Discount {% endcomment %}
+      <!--
+        <li class="previewCartTotals total clearfix">
+          <div class="previewCartTotals-label" style="font-weight: 800;">
+            {{ 'general.cart.final_amount' | t }}
+          </div>
+          <div
+            class="previewCartTotals-value"
+            data-cart-total-value="{{ cart.total_price }}"
+            style="font-weight: 800;"
+            id="cartTotalAmount"
+          >
+            {{ cart.total_price | money }}
+          </div>
+        </li>
+      -->
+      {% if settings.show_shipping_note %}
+        <li class="previewCartTotals shipTotal clearfix">
+          <div class="previewCartTotals-value">
+            {{ 'sections.cart.taxes_included_but_shipping_at_checkout' | t }}
+          </div>
+        </li>
+      {% endif %}
+    </ul>
+    <div class="previewCartAction text-left">
+      {% comment %}
+        {%- if settings.show_global_checkbox -%}
+               <div class="previewCartCheckbox global-checkbox">
+                   <input class="global-checkbox--input" type="checkbox" name="conditions" id="sidebar_cart_conditions" data-target="#cart-sidebar-checkout">
+                   <label class="global-checkbox--label form-label--checkbox" for="sidebar_cart_conditions">
+                       {{ settings.global_checkbox_text }}
+                   </label>
+                   {%- if settings.global_checkbox_link_text != blank -%}
+                       <button type="button" title="{{ settings.global_checkbox_link_text | escape }}" data-term-condition>
+                           {{ settings.global_checkbox_link_text | escape }}
+                       </button>
+                   {%- endif -%}
+               </div>
+           {%- endif -%}
+      {% endcomment %}
+      <span style="opacity: 0; visiblity: hidden; position: absolute;">Side Cart</span>
+      <div class="previewCartGroup">
+        <div style="display: flex; grid-gap:10px;">
+          <button
+            style="margin-top:0px !important;background-color: #008631; color: white; border: none; border-radius: 5px;"
+            class="button button-2 button-checkout"
+            onclick="window.location='{{ routes.cart_url | split: '/cart' | first }}/checkout'"
+            {% if settings.show_global_checkbox %}
+            {% endif %}
+            id="cart-sidebar-checkout"
+          >
+            Proceed To Checkout
+          </button>
+        </div>
+        {% comment %}
+          <div class="previewCartGroup">
+              <div style="display: flex; grid-gap:10px;">
+                <button style="margin-top:0px !important;" class="button button-2 button-checkout" onclick="window.location='{{ routes.cart_url | split: '/cart' | first }}/checkout'"{% if settings.show_global_checkbox %} {% endif %} id="cart-sidebar-checkout">
+                      Place Order
+                </button>
+                  <a style="margin-top:0px !important;" class="button button-2 button-view-cart" href="{{ routes.cart_url }}">
+                      {{ 'sections.cart.view_cart' | t }}
+                  </a>
+              </div>
+             {% render 'gokwik-checkout' %}
+        {% endcomment %}
+        {% comment %}
+          <div style="display: flex; grid-gap:10px;">
+            <button style="margin-top:0px !important;" class="button button-2 button-checkout" onclick="window.location='{{ routes.cart_url | split: '/cart' | first }}/checkout'"{% if settings.show_global_checkbox %} disabled="disabled"{% endif %} id="cart-sidebar-checkout">
+                  Bulk Orders
+            </button>
+              <a style="margin-top:0px !important;" class="button button-2 button-view-cart" href="{{ routes.cart_url }}">
+                  {{ 'sections.cart.view_cart' | t }}
+              </a>
+          </div>
+        {% endcomment %}
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="previewCart">
+    <div class="previewCart-emptyBody text-center">
+      <div class="empty">
+        <span class="text">
+          {{ 'sections.cart.empty' | t }}
+        </span>
+      </div>
+      <a
+        class="button button-2 button-continue"
+        {% if settings.quick_cart_redirect_button == 'go_back' %}
+          role="link" aria-disabled="true"
+          onclick="window.history.back();"
+        {% elsif settings.quick_cart_redirect_button == 'link_to' %}
+          href="{{ settings.quick_cart_redirect_button_link }}"
+        {% else %}
+          role="link" aria-disabled="true"
+          onclick="window.location.reload();"
+        {% endif %}
+      >
+        {{ 'sections.cart.continue_shopping' | t }}
+      </a>
+    </div>
+  </div>
+{% endunless %}
+<div class="discount-loading-section">
+  <div class="loading-spinner" style="display: block;"></div>
+</div>
+<div class="discount-success-section"></div>
+<div class="discount-error-section"></div>
+<script>
+  // var updatedCartTotalAmount2;
+  // var cartSymbol;
+  // var currencySymbol;
+  // var totalCartAmount = document.getElementById("cartTotalAmount");
+  // var totalCartAmountSpan = totalCartAmount.querySelector("span");
+  // var totalDiscount = document.getElementById("total-discount");
+  // var totalDiscountValueSection = document.getElementById("total-discount-value-section");
+  // var totalDiscountSpanSection = totalDiscountValueSection.querySelector("span");
+  // var totalBillBreakdown = document.getElementById("total-bill-breakdown");
+  // var itemTotalMRP = document.getElementById("item-total");
+  // var discountLoadingSectionForCart = document.querySelector(".discount-loading-section");
+  // var shopUrl = '{{ request.origin }}';
+  // var discountBtn = document.querySelector('.apply-discount-code');
+  // var discountInput = document.querySelector('[name="discount"]');
+  // var discountChangeValue = totalDiscountSpanSection.textContent;
+  // var discountChangeValueArray = discountChangeValue.split('');
+  // var newDiscountValue = discountChangeValueArray.join('');
+  // totalDiscountSpanSection.textContent = newDiscountValue;
+
+  // // console.log("Span total cart amount", totalCartAmountSpan.textContent);
+  // setTimeout(()=>{
+  //   cartSymbol = totalCartAmountSpan.textContent[0];
+  //   currencySymbol = totalCartAmountSpan.textContent[totalCartAmountSpan.textContent.length-3] + totalCartAmountSpan.textContent[totalCartAmountSpan.textContent.length-2] + totalCartAmountSpan.textContent[totalCartAmountSpan.textContent.length-1];
+  //   updatedCartTotalAmount2 = totalCartAmountSpan.textContent.substring(1, totalCartAmountSpan.textContent.length - 4);
+  //   // console.log("Currency symbol", currencySymbol);
+  // }, 2000);
+
+  // discountBtn.addEventListener('click', (event) => {
+  //   event.preventDefault();
+  //   // discountLoadingSectionForCart.classList.add("show-loading");
+  //   let discountCode = discountInput.value;
+  //   let xhr = new XMLHttpRequest();
+  //   xhr.open('POST', shopUrl + '/cart.js');
+  //   xhr.setRequestHeader('Content-Type', 'application/json');
+  //   xhr.onreadystatechange = function () {
+  //     if (xhr.readyState === 4) {
+  //       if (xhr.status === 200) {
+  //         fetch(shopUrl + '/cart.js')
+  //           .then(response => {
+  //             if (!response.ok) {
+  //               throw new Error('Failed to fetch cart data');
+  //             }
+  //             return response.json();
+  //           })
+  //           .then(cartData => {
+  //             if(cartData){
+  //               console.log("Data from cartData", cartData);
+  //               cartData.total_price = Math.floor(cartData.total_price / 100);
+  //               totalDiscount.style.display = "block";
+  //               let newDiscountValue = cartData.total_discount;
+  //               newDiscountValue = Math.floor(newDiscountValue / 100);
+  //               if(cart.total_discount == 0){
+  //                 discountChangeValueArray[1] = newDiscountValue;
+  //                 totalDiscountSpanSection.textContent = discountChangeValueArray.join('');
+  //                 totalCartAmountSpan.textContent = cartSymbol + "" + (cartData.total_price / 100).toFixed(2) + " " + currencySymbol;
+  //               }
+  //               // console.log("This value", totalDiscountSpanSection.textContent);
+  //               cart.total_discount = newDiscountValue;
+  //               cart.total_price = cartData.total_price;
+  //               // console.log("Total cart value", cart.total_price);
+  //               // console.log("cart total discount",cart.total_discount);
+  //               }
+  //               discountLoadingSectionForCart.classList.remove("show-loading");
+  //               totalBillBreakdown.style.display = "block";
+  //               itemTotalMRP.style.display = "block";
+  //           })
+  //           .catch(error => {
+  //             console.error('Error fetching cart data:', error);
+  //             // discountLoadingSectionForCart.classList.remove("show-loading");
+  //           });
+  //       } else {
+  //         console.error('Failed to apply discount:', xhr.statusText);
+  //         // discountLoadingSectionForCart.classList.remove("show-loading");
+  //       }
+  //     }
+  //   };
+  //   xhr.send(JSON.stringify({ 'attributes[discount]': discountCode }));
+  // });
+  
+  var sideCartDiscount1 = "{{ settings.side_cart_discount_1 }}";
+  var sideCartDiscount2 = "{{ settings.side_cart_discount_2 }}";
+  var sideCartDiscount3 = "{{ settings.side_cart_discount_3 }}";
+  var sideCartDiscount4 = "{{ settings.side_cart_discount_4 }}";
+  var sideCartDiscount5 = "{{ settings.side_cart_discount_5 }}";
+  var sideCartDiscount6 = "{{ settings.side_cart_discount_6 }}";
+  var sideCartDiscount7 = "{{ settings.side_cart_discount_7 }}";
+  var sideCartDiscount8 = "{{ settings.side_cart_discount_8 }}";
+  var sideCartDiscount9 = "{{ settings.side_cart_discount_9 }}";
+  var sideCartDiscount10 = "{{ settings.side_cart_discount_10 }}";
+
+  var sideCartDiscountValue1 = "{{ settings.side_cart_discount_value_1 }}";
+  var sideCartDiscountValue2 = "{{ settings.side_cart_discount_value_2 }}";
+  var sideCartDiscountValue3 = "{{ settings.side_cart_discount_value_3 }}";
+  var sideCartDiscountValue4 = "{{ settings.side_cart_discount_value_4 }}";
+  var sideCartDiscountValue5 = "{{ settings.side_cart_discount_value_5 }}";
+  var sideCartDiscountValue6 = "{{ settings.side_cart_discount_value_6 }}";
+  var sideCartDiscountValue7 = "{{ settings.side_cart_discount_value_7 }}";
+  var sideCartDiscountValue8 = "{{ settings.side_cart_discount_value_8 }}";
+  var sideCartDiscountValue9 = "{{ settings.side_cart_discount_value_9 }}";
+  var sideCartDiscountValue10 = "{{ settings.side_cart_discount_value_10 }}";
+
+  var sideCartDiscountApplicable1 = "{{ settings.side_cart_discount_1_description }}";
+  var sideCartDiscountApplicable2 = "{{ settings.side_cart_discount_2_description }}";
+  var sideCartDiscountApplicable3 = "{{ settings.side_cart_discount_3_description }}";
+  var sideCartDiscountApplicable4 = "{{ settings.side_cart_discount_4_description }}";
+  var sideCartDiscountApplicable5 = "{{ settings.side_cart_discount_5_description }}";
+  var sideCartDiscountApplicable6 = "{{ settings.side_cart_discount_6_description }}";
+  var sideCartDiscountApplicable7 = "{{ settings.side_cart_discount_7_description }}";
+  var sideCartDiscountApplicable8 = "{{ settings.side_cart_discount_8_description }}";
+  var sideCartDiscountApplicable9 = "{{ settings.side_cart_discount_9_description }}";
+  var sideCartDiscountApplicable10 = "{{ settings.side_cart_discount_10_description }}";
+
+  var sideCartDiscountAdditionalInfo1 = "{{ settings.side_cart_discount_1_additional_information }}";
+  var sideCartDiscountAdditionalInfo2 = "{{ settings.side_cart_discount_2_additional_information }}";
+  var sideCartDiscountAdditionalInfo3 = "{{ settings.side_cart_discount_3_additional_information }}";
+  var sideCartDiscountAdditionalInfo4 = "{{ settings.side_cart_discount_4_additional_information }}";
+  var sideCartDiscountAdditionalInfo5 = "{{ settings.side_cart_discount_5_additional_information }}";
+  var sideCartDiscountAdditionalInfo6 = "{{ settings.side_cart_discount_6_additional_information }}";
+  var sideCartDiscountAdditionalInfo7 = "{{ settings.side_cart_discount_7_additional_information }}";
+  var sideCartDiscountAdditionalInfo8 = "{{ settings.side_cart_discount_8_additional_information }}";
+  var sideCartDiscountAdditionalInfo9 = "{{ settings.side_cart_discount_9_additional_information }}";
+  var sideCartDiscountAdditionalInfo10 = "{{ settings.side_cart_discount_10_additional_information }}";
+
+  var discountInput;
+  var discountApplyBtn;
+  setTimeout(()=>{
+    discountInput = document.querySelector(".docapp-coupon-input--input");
+    discountApplyBtn = document.querySelector(".docapp-coupon-input--button");
+  },2000);
+
+  var sideCartDiscountsArray = [
+    sideCartDiscount1,
+    sideCartDiscount2,
+    sideCartDiscount3,
+    sideCartDiscount4,
+    sideCartDiscount5,
+    sideCartDiscount6,
+    sideCartDiscount7,
+    sideCartDiscount8,
+    sideCartDiscount9,
+    sideCartDiscount10
+  ].filter(item => item && item.trim() !== '');
+
+  var sideCartDiscountDescriptionArray = [
+    sideCartDiscountApplicable1,
+    sideCartDiscountApplicable2,
+    sideCartDiscountApplicable3,
+    sideCartDiscountApplicable4,
+    sideCartDiscountApplicable5,
+    sideCartDiscountApplicable6,
+    sideCartDiscountApplicable7,
+    sideCartDiscountApplicable8,
+    sideCartDiscountApplicable9,
+    sideCartDiscountApplicable10
+  ].filter(item => item && item.trim() !== '');
+
+  var sideCartDiscountsValueArray = [
+    sideCartDiscountValue1,
+    sideCartDiscountValue2,
+    sideCartDiscountValue3,
+    sideCartDiscountValue4,
+    sideCartDiscountValue5,
+    sideCartDiscountValue6,
+    sideCartDiscountValue7,
+    sideCartDiscountValue8,
+    sideCartDiscountValue9,
+    sideCartDiscountValue10
+  ].filter(item => item && item.trim() !== '');
+
+  var sideCartDiscountAdditionalInformationArray = [
+    sideCartDiscountAdditionalInfo1,
+    sideCartDiscountAdditionalInfo2,
+    sideCartDiscountAdditionalInfo3,
+    sideCartDiscountAdditionalInfo4,
+    sideCartDiscountAdditionalInfo5,
+    sideCartDiscountAdditionalInfo6,
+    sideCartDiscountAdditionalInfo7,
+    sideCartDiscountAdditionalInfo8,
+    sideCartDiscountAdditionalInfo9,
+    sideCartDiscountAdditionalInfo10
+  ].filter(item => item && item.trim() !== '');
+
+  var discountsObjectsArray = sideCartDiscountsArray.map((discount, index) => ({
+    discount_name: discount,
+    amountOff: sideCartDiscountDescriptionArray[index],
+    additionalInformation: sideCartDiscountAdditionalInformationArray[index]
+  }));
+
+  // console.log("discountsObjectsArray", discountsObjectsArray);
+
+  var cartToolDiscount = document.getElementById("cart-tool-discount");
+
+  var availableDiscountsOverflowSection = document.querySelector('.available-discounts-overflow-section');
+
+  setTimeout(()=>{
+      discountsObjectsArray.map(item => {
+      let discountDiv = document.createElement('div');
+      discountDiv.classList.add("discountDiv");
+
+      let discountDetailsNestedDiv = document.createElement("div");
+      discountDetailsNestedDiv.classList.add("discountDetailsNestedDiv");
+      discountDetailsNestedDiv.innerHTML = `
+      {% render 'discount-percentage' %}
+      <div>
+        <h4>${item.amountOff}</h4>
+        <p>${item.discount_name}</p>
+        <small>${item.additionalInformation}</small>
+      </div>
+      `;
+
+      let discountArrowSymbol = document.createElement("span");
+      discountArrowSymbol.textContent = ">";
+
+      discountDiv.appendChild(discountDetailsNestedDiv);
+      discountDiv.appendChild(discountArrowSymbol);
+      availableDiscountsOverflowSection.appendChild(discountDiv);
+    });
+  },1000);
+
+  var previewCartDiv;
+  var popupToolDiscount;
+  var discountDivs;
+
+  setTimeout(()=>{
+      popupToolDiscount = document.getElementById("popup-tool-discount");
+      previewCartDiv = document.querySelector(".previewCart");
+      discountDivs = document.querySelectorAll(".discountDiv");
+      discountDivs.forEach(discountDiv => {
+        discountDiv.addEventListener("click", function (){
+        let couponCode = this.querySelector("p").textContent;
+        navigator.clipboard.writeText(couponCode)
+        .then(() => {
+            let h4Element = this.querySelector("h4");
+            let previousContent = h4Element.textContent;
+            h4Element.textContent = "Coupon Copied!!";
+            h4Element.style.color = "#f68424";
+            h4Element.style.fontWeight = "800";
+            setTimeout(()=>{
+                h4Element.textContent = previousContent;
+                h4Element.style.fontWeight = "400";
+                h4Element.style.color = "#232323";
+            }, 1500);
+        });
+          
+        discountInput.textContent = couponCode;
+        discountInput.value = couponCode;
+        setTimeout(()=>{
+            popupToolDiscount.classList.remove("show");
+            previewCartDiv.classList.remove("active-tool");
+        }, 1500);
+
+        setTimeout(() => {
+            discountApplyBtn.click();
+        }, 500);
+      });
+    });
+  },1000);
+
+  setTimeout(()=>{
+      cartToolDiscount.addEventListener("click", function (){
+      previewCartDiv.classList.add("active-tool");
+      popupToolDiscount.classList.add("show");
+    });
+  },1000);
+</script>

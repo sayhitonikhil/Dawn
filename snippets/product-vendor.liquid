@@ -1,0 +1,23 @@
+{%- liquid 
+    assign fontsize_text = block.settings.fontsize_text
+    assign color_title = block.settings.color_title
+    assign text_transform = block.settings.text_transform
+-%}
+<div class="product__vendor" 
+    style="--fontsize-text:{{ fontsize_text | append: 'px' }};
+    --color-title: {{ color_title }};
+    --text-transform: {{ text_transform }}" 
+>
+     {{ "By " | append: product.vendor | link_to_vendor }}
+     {{ current_variant.sku }}
+
+
+</div>
+{%- if show_sku -%}
+        <div class="productView-info-item" data-sku {% unless current_variant.sku != blank %} style="display: none;"{% endunless %}>
+            <span class="productView-info-name">
+                {{ 'products.product.text.sku' | t }}
+            </span>
+            <span class="productView-info-value">{{ current_variant.sku }}</span>
+        </div>
+    {%- endif -%}
